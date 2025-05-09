@@ -90,7 +90,7 @@ static InterchangeObject* PIMFDynamicMetadataDescriptor_Factory(const Dictionary
 static InterchangeObject* IABEssenceDescriptor_Factory(const Dictionary* Dict) { return new IABEssenceDescriptor(Dict); }
 static InterchangeObject* IABSoundfieldLabelSubDescriptor_Factory(const Dictionary* Dict) { return new IABSoundfieldLabelSubDescriptor(Dict); }
 static InterchangeObject* JPEGXSPictureSubDescriptor_Factory(const Dictionary* Dict) { return new JPEGXSPictureSubDescriptor(Dict); }
-
+static InterchangeObject* IABChannelSubDescriptor_Factory(const Dictionary* Dict) { return new IABChannelSubDescriptor(Dict); }
 
 void
 ASDCP::MXF::Metadata_InitTypes(const Dictionary* Dict)
@@ -146,6 +146,7 @@ ASDCP::MXF::Metadata_InitTypes(const Dictionary* Dict)
   SetObjectFactory(Dict->ul(MDD_IABEssenceDescriptor), IABEssenceDescriptor_Factory);
   SetObjectFactory(Dict->ul(MDD_IABSoundfieldLabelSubDescriptor), IABSoundfieldLabelSubDescriptor_Factory);
   SetObjectFactory(Dict->ul(MDD_JPEGXSPictureSubDescriptor), JPEGXSPictureSubDescriptor_Factory);
+  SetObjectFactory(Dict->ul(MDD_IABChannelSubDescriptor), IABChannelSubDescriptor_Factory);
 }
 
 //------------------------------------------------------------------------------------------
@@ -5218,6 +5219,12 @@ IABEssenceDescriptor::InitFromTLVSet(TLVReader& TLVSet)
 {
   assert(m_Dict);
   Result_t result = GenericSoundEssenceDescriptor::InitFromTLVSet(TLVSet);
+
+  if ( ASDCP_SUCCESS(result) ) { 
+    result = TLVSet.ReadUi16(OBJ_READ_ARGS_OPT(IABEssenceDescriptor, IABMaxObjectCount));
+    IABMaxObjectCount.set_has_value( result == RESULT_OK );
+  }
+
   return result;
 }
 
@@ -5227,6 +5234,7 @@ IABEssenceDescriptor::WriteToTLVSet(TLVWriter& TLVSet)
 {
   assert(m_Dict);
   Result_t result = GenericSoundEssenceDescriptor::WriteToTLVSet(TLVSet);
+  if ( ASDCP_SUCCESS(result)  && ! IABMaxObjectCount.empty() ) result = TLVSet.WriteUi16(OBJ_WRITE_ARGS_OPT(IABEssenceDescriptor, IABMaxObjectCount));
   return result;
 }
 
@@ -5235,6 +5243,7 @@ void
 IABEssenceDescriptor::Copy(const IABEssenceDescriptor& rhs)
 {
   GenericSoundEssenceDescriptor::Copy(rhs);
+  IABMaxObjectCount = rhs.IABMaxObjectCount;
 }
 
 //
@@ -5255,6 +5264,10 @@ IABEssenceDescriptor::Dump(FILE* stream)
     stream = stderr;
 
   GenericSoundEssenceDescriptor::Dump(stream);
+
+  if ( ! IABMaxObjectCount.empty() ) {
+    fprintf(stream, "  %22s = %d\n",  "IABMaxObjectCount", IABMaxObjectCount.get());
+  }
 }
 
 //
@@ -5345,6 +5358,111 @@ IABSoundfieldLabelSubDescriptor::InitFromBuffer(const byte_t* p, ui32_t l)
 //
 ASDCP::Result_t
 IABSoundfieldLabelSubDescriptor::WriteToBuffer(ASDCP::FrameBuffer& Buffer)
+{
+  return InterchangeObject::WriteToBuffer(Buffer);
+}
+
+
+//------------------------------------------------------------------------------------------
+// IABChannelSubDescriptor (introduced in ST 2067-201 2024 revision)
+
+//
+
+IABChannelSubDescriptor::IABChannelSubDescriptor(const Dictionary* d) : InterchangeObject(d), IABBedMetaID(0), IABChannelID(0), IABAudioDescription(0)
+{
+  assert(m_Dict);
+  m_UL = m_Dict->ul(MDD_IABChannelSubDescriptor);
+}
+
+IABChannelSubDescriptor::IABChannelSubDescriptor(const IABChannelSubDescriptor& rhs) : InterchangeObject(rhs.m_Dict)
+{
+  assert(m_Dict);
+  m_UL = m_Dict->ul(MDD_IABChannelSubDescriptor);
+  Copy(rhs);
+}
+
+
+//
+ASDCP::Result_t
+IABChannelSubDescriptor::InitFromTLVSet(TLVReader& TLVSet)
+{
+  assert(m_Dict);
+  Result_t result = InterchangeObject::InitFromTLVSet(TLVSet);
+  if ( ASDCP_SUCCESS(result) ) result = TLVSet.ReadUi32(OBJ_READ_ARGS(IABChannelSubDescriptor, IABBedMetaID));
+  if ( ASDCP_SUCCESS(result) ) result = TLVSet.ReadUi32(OBJ_READ_ARGS(IABChannelSubDescriptor, IABChannelID));
+  if ( ASDCP_SUCCESS(result) ) result = TLVSet.ReadUi8(OBJ_READ_ARGS(IABChannelSubDescriptor, IABAudioDescription));
+  if ( ASDCP_SUCCESS(result) ) { 
+    result = TLVSet.ReadObject(OBJ_READ_ARGS_OPT(IABChannelSubDescriptor, IABAudioDescriptionText));
+    IABAudioDescriptionText.set_has_value( result == RESULT_OK );
+  }
+
+  return result;
+}
+
+//
+ASDCP::Result_t
+IABChannelSubDescriptor::WriteToTLVSet(TLVWriter& TLVSet)
+{
+  assert(m_Dict);
+  Result_t result = InterchangeObject::WriteToTLVSet(TLVSet);
+
+  if ( ASDCP_SUCCESS(result) ) result = TLVSet.WriteUi32(OBJ_WRITE_ARGS(IABChannelSubDescriptor, IABBedMetaID));
+  if ( ASDCP_SUCCESS(result) ) result = TLVSet.WriteUi32(OBJ_WRITE_ARGS(IABChannelSubDescriptor, IABChannelID));
+  if ( ASDCP_SUCCESS(result) ) result = TLVSet.WriteUi8(OBJ_WRITE_ARGS(IABChannelSubDescriptor, IABAudioDescription));
+  if ( ASDCP_SUCCESS(result)  && ! IABAudioDescriptionText.empty() ) result = TLVSet.WriteObject(OBJ_WRITE_ARGS_OPT(IABChannelSubDescriptor, IABAudioDescriptionText));
+
+  return result;
+}
+
+//
+void
+IABChannelSubDescriptor::Copy(const IABChannelSubDescriptor& rhs)
+{
+  InterchangeObject::Copy(rhs);
+  IABBedMetaID = rhs.IABBedMetaID;
+  IABChannelID = rhs.IABChannelID;
+  IABAudioDescription = rhs.IABAudioDescription;
+  IABAudioDescriptionText = rhs.IABAudioDescriptionText;
+}
+
+//
+InterchangeObject*
+IABChannelSubDescriptor::Clone() const
+{
+  return new IABChannelSubDescriptor(*this);
+}
+
+//
+void
+IABChannelSubDescriptor::Dump(FILE* stream)
+{
+  char identbuf[IdentBufferLen];
+  *identbuf = 0;
+
+  if ( stream == 0 )
+    stream = stderr;
+
+  InterchangeObject::Dump(stream);
+
+  fprintf(stream, "  %22s = %d\n",  "IABBedMetaID", IABBedMetaID);
+  fprintf(stream, "  %22s = %d\n",  "IABChannelID", IABChannelID);
+  fprintf(stream, "  %22s = %d\n",  "IABAudioDescription", IABAudioDescription);
+  if ( ! IABAudioDescriptionText.empty() ) {
+    fprintf(stream, "  %22s = %s\n",  "IABAudioDescriptionText", IABAudioDescriptionText.get().EncodeString(identbuf, IdentBufferLen));
+  }
+
+}
+
+//
+ASDCP::Result_t
+IABChannelSubDescriptor::InitFromBuffer(const byte_t* p, ui32_t l)
+{
+  return InterchangeObject::InitFromBuffer(p, l);
+}
+
+//
+ASDCP::Result_t
+IABChannelSubDescriptor::WriteToBuffer(ASDCP::FrameBuffer& Buffer)
 {
   return InterchangeObject::WriteToBuffer(Buffer);
 }
