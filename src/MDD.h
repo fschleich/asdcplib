@@ -617,12 +617,17 @@ namespace ASDCP {
 	MDD_JP2KEssenceCompression_IMFProfile_2K_Lossy_6_2, // 579
 	MDD_JP2KEssenceCompression_IMFProfile_2K_Lossy_6_3, // 580
 	MDD_JP2KEssenceCompression_IMFProfile_2K_Lossy_6_4, // 581
-    MDD_IABChannelSubDescriptor, // 582
-    MDD_IABChannelSubDescriptor_IABBedMetaID, // 583
-    MDD_IABChannelSubDescriptor_IABChannelID, // 584
-    MDD_IABChannelSubDescriptor_IABAudioDescription, // 585
-    MDD_IABChannelSubDescriptor_IABAudioDescriptionText, // 586
-    MDD_IABEssenceDescriptor_IABMaxObjectCount, // 587
+	MDD_DCAudioSoundfield_514, // 582
+	MDD_DCAudioChannel_Ltfs, // 583
+	MDD_DCAudioChannel_Rtfs, // 584
+	MDD_DCAudioChannel_Ltrs, // 585
+	MDD_DCAudioChannel_Rtrs, // 586
+    MDD_IABChannelSubDescriptor, // 587
+    MDD_IABChannelSubDescriptor_IABBedMetaID, // 588
+    MDD_IABChannelSubDescriptor_IABChannelID, // 589
+    MDD_IABChannelSubDescriptor_IABAudioDescription, // 590
+    MDD_IABChannelSubDescriptor_IABAudioDescriptionText, // 591
+    MDD_IABEssenceDescriptor_IABMaxObjectCount, // 592
 	MDD_Max
     }; // enum MDD_t
 
