@@ -466,7 +466,7 @@ public:
 	use_cdci_descriptor = true;
 	break;
 
-	      case '6':
+      case '6':
 	transfer_characteristic = g_dict->ul(MDD_TransferCharacteristic_SMPTEST2084);
 	color_primaries = g_dict->ul(MDD_ColorPrimaries_P3D65);
 	use_cdci_descriptor = false;
