@@ -39,6 +39,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AS_02_IAB.h"
 #include <Metadata.h>
 #include <sstream>
+#include <memory>
 
 using namespace ASDCP;
 
