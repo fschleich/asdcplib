@@ -142,14 +142,22 @@ struct IABChannelSubDescriptorParameters {
 
 // Sanity check for IABChannelSubDescriptor parameters:
 // - ensures that no two descriptors have the same iabBedMetaId AND iabChannelId
-// - ensures that iabAudioDescriptionText is only provided if iabAudioDescription is 0x80
+// - ensures that iabAudioDescriptionText is present if and only if the most
+//   significant bit (0x80) of iabAudioDescription is set (see SMPTE ST 2067-201
+//   Annex E.2.5 and SMPTE ST 2098-2 Subclause 10.3.13)
 bool validateIABChannelSubDescriptorParameters(const std::vector<IABChannelSubDescriptorParameters>& descriptors) {
     for (size_t i = 0; i < descriptors.size(); ++i) {
         const auto& current = descriptors[i];
 
-        // Ensure that no iabAudioDescriptionText is provided if iabAudioDescription is not 0x08
-        if (current.iabAudioDescription != 0x80 && current.iabAudioDescriptionText != nullptr) {
-            fprintf(stderr, "Invalid parameter: AudioDescriptionText can only be provided if AudioDescription is set to 128 (0x80).\n");
+        // AudioDescriptionText is present if and only if the MSB of AudioDescription is set.
+        const bool text_present = current.iabAudioDescriptionText != nullptr;
+        const bool msb_set = (current.iabAudioDescription & 0x80) != 0;
+        if (text_present && !msb_set) {
+            fprintf(stderr, "Invalid parameter: AudioDescriptionText can only be provided when the most significant bit (0x80) of AudioDescription is set (value: %u).\n", current.iabAudioDescription);
+            return false;
+        }
+        if (msb_set && !text_present) {
+            fprintf(stderr, "Invalid parameter: AudioDescriptionText is required when the most significant bit (0x80) of AudioDescription is set (value: %u).\n", current.iabAudioDescription);
             return false;
         }
 
