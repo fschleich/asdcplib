@@ -940,6 +940,8 @@ namespace ASDCP
           optional_property<UTF16String > MCAPartitionNumber;
           optional_property<UTF16String > MCAAudioContentKind;
           optional_property<UTF16String > MCAAudioElementKind;
+          optional_property<UTF16String > MCAContent;
+          optional_property<UTF16String > MCAUseClass;
 
       MCALabelSubDescriptor(const Dictionary* d);
       MCALabelSubDescriptor(const MCALabelSubDescriptor& rhs);

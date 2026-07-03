@@ -628,6 +628,8 @@ namespace ASDCP {
     MDD_IABChannelSubDescriptor_IABAudioDescription, // 590
     MDD_IABChannelSubDescriptor_IABAudioDescriptionText, // 591
     MDD_IABEssenceDescriptor_IABMaxObjectCount, // 592
+    MDD_MCALabelSubDescriptor_MCAContent, // 593
+    MDD_MCALabelSubDescriptor_MCAUseClass, // 594
 	MDD_Max
     }; // enum MDD_t
 

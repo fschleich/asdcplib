@@ -123,6 +123,9 @@ Options:\n\
   -r <n>/<d>        - Edit Rate of the output file.  24/1 is the default\n\
   -m <count>        - maximum count of Object Definitions per IAFrame in the IAB \n\
   -c <bedMetaId>,<channelId>,<audioDescription>[,<audioDescriptionText>]    - set of values for a single IAB channel subdescriptor, parameter can be used multiple time\n\
+  -C <mca-content>  - MCA Content value of the IAB Soundfield Label SubDescriptor (per SMPTE ST 377-41)\n\
+  -u <mca-use-class>\n\
+                    - MCA Use Class value of the IAB Soundfield Label SubDescriptor (per SMPTE ST 377-41)\n\
   -v                - Verbose, prints informative messages to stderr\n\
 \n\
   NOTES: o There is no option grouping, all options must be distinct arguments.\n\
@@ -231,6 +234,8 @@ public:
   byte_t asset_id_value[UUIDlen];// value of asset ID (when asset_id_flag is true)
   Kumu::PathList_t filenames;  // list of filenames to be processed
   std::string language;
+  std::string mca_content;    // MCA Content value for the IAB Soundfield Label SubDescriptor
+  std::string mca_use_class;  // MCA Use Class value for the IAB Soundfield Label SubDescriptor
   std::string out_file;
 
   CommandOptions(int argc, const char** argv) :
@@ -304,6 +309,16 @@ public:
       break;
     }
       
+	      case 'C':
+		TEST_EXTRA_ARG(i, 'C');
+		mca_content = argv[i];
+		break;
+
+	      case 'u':
+		TEST_EXTRA_ARG(i, 'u');
+		mca_use_class = argv[i];
+		break;
+
 	      case 'V': version_flag = true; break;
 	      case 'v': verbose_flag = true; break;
 
@@ -381,7 +396,15 @@ write_IAB_file(CommandOptions& Options)
   }
 
   iab_subdescr.RFC5646SpokenLanguage = Options.language;
- 
+
+  // MCA Content and MCA Use Class (SMPTE ST 2067-201 5.10.3, per ST 377-41:2023)
+  if ( ! Options.mca_content.empty() ) {
+    iab_subdescr.MCAContent.set(ASDCP::MXF::UTF16String(Options.mca_content.c_str()));
+  }
+  if ( ! Options.mca_use_class.empty() ) {
+    iab_subdescr.MCAUseClass.set(ASDCP::MXF::UTF16String(Options.mca_use_class.c_str()));
+  }
+
   // set up essence parser
   assert(Options.filenames.size() == 1);
   Result_t result = Parser.OpenRead(Options.filenames.front());

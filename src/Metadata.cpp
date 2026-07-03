@@ -3798,6 +3798,14 @@ MCALabelSubDescriptor::InitFromTLVSet(TLVReader& TLVSet)
     result = TLVSet.ReadObject(OBJ_READ_ARGS_OPT(MCALabelSubDescriptor, MCAAudioElementKind));
     MCAAudioElementKind.set_has_value( result == RESULT_OK );
   }
+  if ( ASDCP_SUCCESS(result) ) {
+    result = TLVSet.ReadObject(OBJ_READ_ARGS_OPT(MCALabelSubDescriptor, MCAContent));
+    MCAContent.set_has_value( result == RESULT_OK );
+  }
+  if ( ASDCP_SUCCESS(result) ) {
+    result = TLVSet.ReadObject(OBJ_READ_ARGS_OPT(MCALabelSubDescriptor, MCAUseClass));
+    MCAUseClass.set_has_value( result == RESULT_OK );
+  }
   return result;
 }
 
@@ -3821,6 +3829,8 @@ MCALabelSubDescriptor::WriteToTLVSet(TLVWriter& TLVSet)
   if ( ASDCP_SUCCESS(result)  && ! MCAPartitionNumber.empty() ) result = TLVSet.WriteObject(OBJ_WRITE_ARGS_OPT(MCALabelSubDescriptor, MCAPartitionNumber));
   if ( ASDCP_SUCCESS(result)  && ! MCAAudioContentKind.empty() ) result = TLVSet.WriteObject(OBJ_WRITE_ARGS_OPT(MCALabelSubDescriptor, MCAAudioContentKind));
   if ( ASDCP_SUCCESS(result)  && ! MCAAudioElementKind.empty() ) result = TLVSet.WriteObject(OBJ_WRITE_ARGS_OPT(MCALabelSubDescriptor, MCAAudioElementKind));
+  if ( ASDCP_SUCCESS(result)  && ! MCAContent.empty() ) result = TLVSet.WriteObject(OBJ_WRITE_ARGS_OPT(MCALabelSubDescriptor, MCAContent));
+  if ( ASDCP_SUCCESS(result)  && ! MCAUseClass.empty() ) result = TLVSet.WriteObject(OBJ_WRITE_ARGS_OPT(MCALabelSubDescriptor, MCAUseClass));
   return result;
 }
 
@@ -3843,6 +3853,8 @@ MCALabelSubDescriptor::Copy(const MCALabelSubDescriptor& rhs)
   MCAPartitionNumber = rhs.MCAPartitionNumber;
   MCAAudioContentKind = rhs.MCAAudioContentKind;
   MCAAudioElementKind = rhs.MCAAudioElementKind;
+  MCAContent = rhs.MCAContent;
+  MCAUseClass = rhs.MCAUseClass;
 }
 
 //
@@ -3898,6 +3910,12 @@ MCALabelSubDescriptor::Dump(FILE* stream)
   }
   if ( ! MCAAudioElementKind.empty() ) {
     fprintf(stream, "  %22s = %s\n",  "MCAAudioElementKind", MCAAudioElementKind.get().EncodeString(identbuf, IdentBufferLen));
+  }
+  if ( ! MCAContent.empty() ) {
+    fprintf(stream, "  %22s = %s\n",  "MCAContent", MCAContent.get().EncodeString(identbuf, IdentBufferLen));
+  }
+  if ( ! MCAUseClass.empty() ) {
+    fprintf(stream, "  %22s = %s\n",  "MCAUseClass", MCAUseClass.get().EncodeString(identbuf, IdentBufferLen));
   }
 }
 
