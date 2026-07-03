@@ -5382,7 +5382,7 @@ IABSoundfieldLabelSubDescriptor::WriteToBuffer(ASDCP::FrameBuffer& Buffer)
 
 
 //------------------------------------------------------------------------------------------
-// IABChannelSubDescriptor (introduced in ST 2067-201 2024 revision)
+// IABChannelSubDescriptor (introduced in SMPTE ST 2067-201:2026)
 
 //
 

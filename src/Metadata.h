@@ -1306,7 +1306,7 @@ namespace ASDCP
 
 	public:
 
-      // introduced in ST 2067-201 2024 revision
+      // introduced in SMPTE ST 2067-201:2026
       optional_property<ui16_t > IABMaxObjectCount;
 
       IABEssenceDescriptor(const Dictionary* d);
@@ -1347,7 +1347,7 @@ namespace ASDCP
 	};
 
 
-      // introduced in ST 2067-201 2024 revision
+      // introduced in SMPTE ST 2067-201:2026
       class IABChannelSubDescriptor : public InterchangeObject
       {
             IABChannelSubDescriptor();
